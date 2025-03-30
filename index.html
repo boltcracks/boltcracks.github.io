@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bolt!</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #1C2526; /* Midnight-ish */
+            color: #7289DA; /* Blurple text */
+            font-family: Arial, sans-serif;
+            overflow: hidden; /* Prevent scroll during loading */
+        }
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1C2526;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+        #loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #loading-text {
+            font-size: 60px;
+            font-weight: bold;
+            text-shadow: 
+                0 0 10px #FF0000, /* Red glow */
+                0 0 20px #800080; /* Purple glow */
+            margin-bottom: 20px;
+        }
+        .bullet {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #FF0000;
+            animation: shoot 1s linear infinite;
+        }
+        @keyframes shoot {
+            0% { left: -20px; }
+            100% { left: 100%; }
+        }
+        h1 {
+            font-size: 72px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-shadow: 
+                0 0 10px #FF0000, /* Red glow */
+                0 0 20px #800080; /* Purple glow */
+        }
+        .auth-container {
+            margin-top: 50px;
+            background-color: #2A3439; /* Darker panel */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); /* Red-tinted shadow */
+            width: 300px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+        .auth-container.visible {
+            opacity: 1;
+        }
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .tab {
+            background-color: #1C2526;
+            padding: 10px;
+            width: 50%;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            color: #7289DA;
+            font-weight: bold;
+        }
+        .tab.active {
+            background-color: #7289DA;
+            color: #fff;
+        }
+        .form {
+            text-align: center;
+            display: none;
+        }
+        .form.active {
+            display: block;
+        }
+        .auth-container select, .auth-container input {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #1C2526;
+            border: 1px solid #7289DA;
+            color: #fff;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .auth-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #7289DA; /* Blurple button */
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .auth-container button:hover {
+            background-color: #FF0000; /* Red on hover */
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-screen">
+        <div id="loading-text">BOLT! BEST CRACKING TEAM</div>
+    </div>
+    <h1>Bolt!</h1>
+    <div class="auth-container">
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('login')">Login</div>
+            <div class="tab" onclick="showTab('signup')">Signup</div>
+        </div>
+        <div id="login-form" class="form active">
+            <select id="username">
+                <option value="Bolt!">Bolt! (UID-0001)</option>
+                <option value="listn">listn (UID-0002)</option>
+            </select>
+            <input type="password" id="password" placeholder="Password" />
+            <button onclick="login()">Login</button>
+        </div>
+        <div id="signup-form" class="form">
+            <input type="text" id="signup-username" placeholder="Username" />
+            <input type="password" id="signup-password" placeholder="Password" />
+            <input type="text" id="invite-code" placeholder="Invitation Code" />
+            <button onclick="signup()">Signup</button>
+        </div>
+    </div>
+
+    <script>
+        const hardcodedUsers = {
+            'Bolt!': { uid: 'UID-0001', password: 'bolt!', role: 'Bolt!', created: '2025-03-29T12:00:00Z', lastOnline: new Date().toISOString() },
+            'listn': { uid: 'UID-0002', password: 'listnupdates', role: 'listn', created: '2025-03-29T12:05:00Z', lastOnline: new Date().toISOString() }
+        };
+
+        let storedUsers = JSON.parse(localStorage.getItem('boltUsers')) || {};
+
+        const lastUsername = localStorage.getItem('lastUsername') || 'Bolt!';
+        document.getElementById('username').value = lastUsername;
+
+        // Loading screen logic
+        function createBullet() {
+            const bullet = document.createElement('div');
+            bullet.className = 'bullet';
+            bullet.style.top = `${Math.random() * (window.innerHeight - 20)}px`; // Random vertical position
+            document.getElementById('loading-screen').appendChild(bullet);
+            setTimeout(() => bullet.remove(), 1000); // Remove after animation
+        }
+
+        const bulletInterval = setInterval(createBullet, 100);
+        setTimeout(() => {
+            clearInterval(bulletInterval);
+            document.getElementById('loading-screen').classList.add('hidden');
+            document.querySelector('.auth-container').classList.add('visible');
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }, 3000);
+
+        function showTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
+            document.querySelector(`.tab[onclick="showTab('${tab}')"]`).classList.add('active');
+            document.getElementById(`${tab}-form`).classList.add('active');
+        }
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const user = hardcodedUsers[username] || storedUsers[username];
+
+            if (user && password === user.password) {
+                user.lastOnline = new Date().toISOString();
+                if (!hardcodedUsers[username]) {
+                    storedUsers[username] = user;
+                    localStorage.setItem('boltUsers', JSON.stringify(storedUsers));
+                }
+                localStorage.setItem('lastUsername', username);
+                window.location.href = `chat.html?uid=${user.uid}&username=${encodeURIComponent(username)}`;
+            } else {
+                alert('Wrong fucking password or username, dipshit. Try again.');
+            }
+        }
+
+        function signup() {
+            const username = document.getElementById('signup-username').value.trim();
+            const password = document.getElementById('signup-password').value.trim();
+            const inviteCode = document.getElementById('invite-code').value.trim();
+
+            if (!username || !password || !inviteCode) {
+                alert('Fill in all fucking fields, asshole.');
+                return;
+            }
+
+            if (inviteCode !== 'BOLT2025') {
+                alert('Invalid fucking invitation code, dipshit. Get the right one.');
+                return;
+            }
+
+            const allUsers = { ...hardcodedUsers, ...storedUsers };
+            if (Object.keys(allUsers).some(u => u.toLowerCase() === username.toLowerCase())) {
+                alert('That username’s taken, fuckwit. Pick another.');
+                return;
+            }
+
+            const uid = `UID-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+            storedUsers[username] = {
+                uid,
+                password,
+                role: 'Member',
+                created: new Date().toISOString(),
+                lastOnline: new Date().toISOString()
+            };
+
+            localStorage.setItem('boltUsers', JSON.stringify(storedUsers));
+            localStorage.setItem('lastUsername', username);
+            alert('Signed up, you prick. Now log in.');
+            showTab('login');
+            document.getElementById('username').innerHTML += `<option value="${username}">${username} (${uid})</option>`;
+            document.getElementById('username').value = username;
+        }
+    </script>
+</body>
+</html>

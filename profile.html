@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bolt! - Profile</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #1C2526;
+            color: #7289DA;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            font-size: 72px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-shadow: 0 0 10px #FF0000, 0 0 20px #800080;
+        }
+        .profile-container {
+            margin-top: 50px;
+            background-color: #2A3439;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+            width: 400px;
+        }
+        .profile-info {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        .pfp {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            object-fit: cover;
+            border: 2px solid #7289DA;
+        }
+        .links {
+            display: flex;
+            justify-content: space-between;
+        }
+        .link {
+            background-color: #7289DA;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+        .link:hover {
+            background-color: #FF0000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bolt!</h1>
+    <div class="profile-container">
+        <img id="pfp" class="pfp" src="" alt="Profile Picture" />
+        <div class="profile-info" id="profile-info"></div>
+        <div class="links">
+            <a href="#" id="bio-link" class="link">Edit Bio</a>
+            <a href="#" id="chat-link" class="link">Go to Chat</a>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const uid = urlParams.get('uid') || 'UID-UNKNOWN';
+        const username = urlParams.get('username') || 'Anonymous';
+
+        const hardcodedUsers = {
+            'Bolt!': { uid: 'UID-0001', created: '2025-03-29T12:00:00Z', lastOnline: new Date().toISOString(), role: 'Bolt!' },
+            'listn': { uid: 'UID-0002', created: '2025-03-29T12:05:00Z', lastOnline: new Date().toISOString(), role: 'listn' }
+        };
+
+        let storedUsers = JSON.parse(localStorage.getItem('boltUsers')) || {};
+        const allUsers = { ...hardcodedUsers, ...storedUsers };
+        const userData = allUsers[username] || { created: 'Unknown', lastOnline: 'Unknown', role: 'Member' };
+
+        let bioData = JSON.parse(localStorage.getItem('boltBioData')) || {
+            'UID-0001': { displayName: 'Bolt!', pfp: 'https://via.placeholder.com/100' },
+            'UID-0002': { displayName: 'listn', pfp: 'https://via.placeholder.com/100' }
+        };
+
+        document.getElementById('pfp').src = bioData[uid].pfp;
+        document.getElementById('profile-info').innerHTML = `
+            Username: ${username} (${uid})<br>
+            Display Name: ${bioData[uid].displayName}<br>
+            Joined: ${new Date(userData.created).toLocaleString()}<br>
+            Last Online: ${new Date(userData.lastOnline).toLocaleString()}<br>
+            Role: ${userData.role}
+        `;
+        document.getElementById('bio-link').href = `bio.html?uid=${uid}&username=${encodeURIComponent(username)}`;
+        document.getElementById('chat-link').href = `chat.html?uid=${uid}&username=${encodeURIComponent(username)}`;
+    </script>
+</body>
+</html>

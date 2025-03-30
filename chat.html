@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bolt! - Chat</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #1C2526;
+            color: #7289DA;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            font-size: 72px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-shadow: 0 0 10px #FF0000, 0 0 20px #800080;
+        }
+        .chat-container {
+            margin-top: 50px;
+            background-color: #2A3439;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+            width: 800px;
+        }
+        .user-info {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .link {
+            background-color: #7289DA;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        .link:hover {
+            background-color: #FF0000;
+        }
+        .chat-box {
+            background-color: #1C2526;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #7289DA;
+        }
+        .message {
+            background-color: #2A3439;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
+        }
+        .message p {
+            margin: 0;
+            color: #fff;
+            font-size: 18px;
+            word-wrap: break-word;
+        }
+        .message .meta {
+            font-size: 14px;
+            color: #7289DA;
+            margin-top: 8px;
+        }
+        .chat-form {
+            margin-top: 20px;
+        }
+        .chat-form textarea {
+            width: 100%;
+            height: 80px;
+            background-color: #1C2526;
+            border: 1px solid #7289DA;
+            color: #fff;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .chat-form button {
+            width: 100%;
+            padding: 12px;
+            background-color: #7289DA;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .chat-form button:hover {
+            background-color: #FF0000;
+        }
+        .bio-form {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            background-color: #2A3439;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+        .bio-form.active {
+            display: block;
+        }
+        .bio-form input, .bio-form button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #1C2526;
+            border: 1px solid #7289DA;
+            color: #fff;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .bio-form button {
+            background-color: #7289DA;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .bio-form button:hover {
+            background-color: #FF0000;
+        }
+        .role-management {
+            margin-top: 20px;
+            display: none;
+        }
+        .role-management.active {
+            display: block;
+        }
+        .role-management select, .role-management button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #1C2526;
+            border: 1px solid #7289DA;
+            color: #fff;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .role-management button {
+            background-color: #7289DA;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .role-management button:hover {
+            background-color: #FF0000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bolt!</h1>
+    <div class="chat-container">
+        <div class="user-info" id="user-info">
+            <div>
+                <a href="#" id="profile-link" class="link">Profile</a>
+            </div>
+            <div>
+                <a href="#" id="bio-link" class="link" onclick="toggleBioForm()">Bio</a>
+            </div>
+        </div>
+        <div id="bio-form" class="bio-form">
+            <input type="text" id="display-name" placeholder="Display Name" />
+            <input type="file" id="pfp-upload" accept="image/*" />
+            <button onclick="saveBio()">Save</button>
+        </div>
+        <div class="chat-box" id="chat-box"></div>
+        <div class="chat-form">
+            <textarea id="chat-content" placeholder="Type your fucking message..."></textarea>
+            <button onclick="sendMessage()">Send</button>
+        </div>
+        <div id="role-management" class="role-management">
+            <h3>Manage Roles</h3>
+            <select id="user-select"></select>
+            <select id="role-select">
+                <option value="Bolt!">Bolt!</option>
+                <option value="listn">listn</option>
+                <option value="Member">Member</option>
+            </select>
+            <button onclick="changeRole()">Change Role</button>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const uid = urlParams.get('uid') || 'UID-UNKNOWN';
+        const username = urlParams.get('username') || 'Anonymous';
+
+        const hardcodedUsers = {
+            'Bolt!': { uid: 'UID-0001', created: '2025-03-29T12:00:00Z', lastOnline: new Date().toISOString(), role: 'Bolt!' },
+            'listn': { uid: 'UID-0002', created: '2025-03-29T12:05:00Z', lastOnline: new Date().toISOString(), role: 'listn' }
+        };
+
+        let storedUsers = JSON.parse(localStorage.getItem('boltUsers')) || {};
+        const allUsers = { ...hardcodedUsers, ...storedUsers };
+        const userData = allUsers[username] || { created: 'Unknown', lastOnline: 'Unknown', role: 'Member' };
+
+        let bioData = JSON.parse(localStorage.getItem('boltBioData')) || {
+            'UID-0001': { displayName: 'Bolt!', pfp: 'https://via.placeholder.com/100' },
+            'UID-0002': { displayName: 'listn', pfp: 'https://via.placeholder.com/100' }
+        };
+
+        document.getElementById('user-info').innerHTML = `
+            <div>
+                <a href="recent.html?uid=${uid}&username=${encodeURIComponent(username)}" id="profile-link" class="link">Profile</a>
+            </div>
+            <div>
+                Logged in as: ${username} (${uid})<br>
+                Role: ${userData.role}
+                <a href="#" id="bio-link" class="link" onclick="toggleBioForm()">Bio</a>
+            </div>
+        `;
+
+        let messages = JSON.parse(localStorage.getItem('boltMessages')) || [
+            { id: 1, content: "This chat’s alive, bitches!", uid: "UID-0001", username: "Bolt!", created: "2025-03-29T12:00:00Z" },
+            { id: 2, content: "Hell yeah it is!", uid: "UID-0002", username: "listn", created: "2025-03-29T12:05:00Z" },
+            { id: 3, content: "Pineapple on pizza rules.", uid: "UID-0001", username: "Bolt!", created: "2025-03-29T12:15:00Z" }
+        ];
+
+        document.getElementById('display-name').value = bioData[uid]?.displayName || username;
+
+        if (uid === 'UID-0001') { // Bolt! role management
+            const roleManagement = document.getElementById('role-management');
+            roleManagement.classList.add('active');
+            const userSelect = document.getElementById('user-select');
+            Object.entries(allUsers).forEach(([name, data]) => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.text = `${name} (${data.uid}) - ${data.role}`;
+                userSelect.appendChild(option);
+            });
+        }
+
+        function toggleBioForm() {
+            const bioForm = document.getElementById('bio-form');
+            bioForm.classList.toggle('active');
+        }
+
+        function saveBio() {
+            const displayName = document.getElementById('display-name').value.trim() || bioData[uid]?.displayName || username;
+            const fileInput = document.getElementById('pfp-upload');
+            const file = fileInput.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    bioData[uid] = { displayName, pfp: e.target.result };
+                    localStorage.setItem('boltBioData', JSON.stringify(bioData));
+                    alert('Bio fucking updated, prick.');
+                    toggleBioForm();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                bioData[uid] = { displayName, pfp: bioData[uid]?.pfp || 'https://via.placeholder.com/100' };
+                localStorage.setItem('boltBioData', JSON.stringify(bioData));
+                alert('Bio fucking updated, prick.');
+                toggleBioForm();
+            }
+        }
+
+        function renderMessages() {
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML = '';
+            messages.forEach(msg => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'message';
+                msgDiv.innerHTML = `
+                    <p>${msg.content}</p>
+                    <div class="meta">Sent by ${msg.username} (${msg.uid}) on ${new Date(msg.created).toLocaleString()}</div>
+                `;
+                chatBox.appendChild(msgDiv);
+            });
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function sendMessage() {
+            const content = document.getElementById('chat-content').value.trim();
+            if (content) {
+                const newId = messages.length ? Math.max(...messages.map(m => m.id)) + 1 : 1;
+                messages.push({
+                    id: newId,
+                    content,
+                    uid,
+                    username,
+                    created: new Date().toISOString()
+                });
+                document.getElementById('chat-content').value = '';
+                localStorage.setItem('boltMessages', JSON.stringify(messages));
+                renderMessages();
+            }
+        }
+
+        function changeRole() {
+            const selectedUsername = document.getElementById('user-select').value;
+            const newRole = document.getElementById('role-select').value;
+
+            if (selectedUsername === 'Bolt!') {
+                alert('You can’t change your own fucking role, dipshit.');
+                return;
+            }
+
+            if (hardcodedUsers[selectedUsername]) {
+                hardcodedUsers[selectedUsername].role = newRole;
+            } else {
+                storedUsers[selectedUsername].role = newRole;
+                localStorage.setItem('boltUsers', JSON.stringify(storedUsers));
+            }
+
+            alert(`Changed ${selectedUsername}’s role to ${newRole}, you prick.`);
+            location.reload();
+        }
+
+        renderMessages();
+    </script>
+</body>
+</html>

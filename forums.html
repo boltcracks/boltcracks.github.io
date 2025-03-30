@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bolt! - Forums</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #1C2526; /* Midnight-ish */
+            color: #7289DA; /* Blurple text */
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            font-size: 72px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-shadow: 
+                0 0 10px #FF0000, /* Red glow */
+                0 0 20px #800080; /* Purple glow */
+        }
+        .nav-tabs {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        .nav-tab {
+            padding: 8px 15px;
+            background-color: #2A3439;
+            color: #7289DA;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .nav-tab:hover {
+            background-color: #FF0000;
+            color: #fff;
+        }
+        .profile-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            background-color: #2A3439;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+        .profile-pfp {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid #7289DA;
+        }
+        .profile-info {
+            color: #fff;
+            font-size: 14px;
+        }
+        .forums-container {
+            margin-top: 50px;
+            background-color: #2A3439; /* Darker panel */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); /* Red-tinted shadow */
+            width: 700px;
+        }
+        .user-info {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        .user-info a {
+            color: #7289DA;
+            text-decoration: none;
+        }
+        .user-info a:hover {
+            color: #FF0000;
+        }
+        .announcements {
+            background-color: #1C2526;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .announcements h2 {
+            color: #7289DA;
+            font-size: 24px;
+            margin: 0 0 15px 0;
+        }
+        .announcement {
+            background-color: #2A3439;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .announcement p {
+            margin: 0;
+            color: #fff;
+            font-size: 14px;
+        }
+        .announcement .meta {
+            font-size: 12px;
+            color: #7289DA;
+            margin-top: 5px;
+        }
+        .announcement-form {
+            margin-bottom: 20px;
+        }
+        .announcement-form textarea {
+            width: 100%;
+            height: 60px;
+            background-color: #1C2526;
+            border: 1px solid #7289DA;
+            color: #fff;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .announcement-form button {
+            width: 100%;
+            padding: 8px;
+            background-color: #7289DA;
+            border: none;
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .announcement-form button:hover {
+            background-color: #FF0000;
+        }
+        .thread {
+            background-color: #1C2526;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+        .thread h3 {
+            margin: 0 0 10px 0;
+            color: #7289DA;
+            font-size: 24px;
+        }
+        .thread .op {
+            margin: 0 0 10px 0;
+            color: #fff;
+            font-size: 16px;
+        }
+        .thread .meta {
+            font-size: 14px;
+            color: #7289DA;
+            margin-top: 5px;
+        }
+        .comments {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        .comment {
+            background-color: #2A3439;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .comment p {
+            margin: 0;
+            color: #fff;
+            font-size: 14px;
+        }
+        .post-form {
+            margin-top: 20px;
+        }
+        .post-form input, .post-form textarea {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #1C2526;
+            border: 1px solid #7289DA;
+            color: #fff;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .post-form textarea {
+            height: 100px;
+        }
+        .post-form button {
+            width: 100%;
+            padding: 10px;
+            background-color: #7289DA;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .post-form button:hover {
+            background-color: #FF0000;
+        }
+        .reply-form {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        .reply-form textarea {
+            width: 100%;
+            height: 60px;
+            background-color: #1C2526;
+            border: 1px solid #7289DA;
+            color: #fff;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .reply-form button {
+            width: 100%;
+            padding: 8px;
+            background-color: #7289DA;
+            border: none;
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .reply-form button:hover {
+            background-color: #FF0000;
+        }
+        .chat-log {
+            margin-top: 30px;
+            background-color: #2A3439;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .chat-log h2 {
+            color: #7289DA;
+            font-size: 24px;
+            margin: 0 0 15px 0;
+        }
+        .chat-entry {
+            background-color: #1C2526;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .chat-entry p {
+            margin: 0;
+            color: #fff;
+            font-size: 14px;
+        }
+        .chat-entry .meta {
+            font-size: 12px;
+            color: #7289DA;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-tabs">
+        <a href="#" class="nav-tab" id="bio-tab">Bio</a>
+    </div>
+    <div class="profile-container">
+        <img src="" class="profile-pfp" id="profile-pfp" alt="Profile Picture">
+        <div class="profile-info" id="display-name"></div>
+    </div>
+    <h1>Bolt!</h1>
+    <div class="forums-container">
+        <div class="user-info" id="user-info"></div>
+        <div class="announcements">
+            <h2>Announcements</h2>
+            <div id="announcement-entries"></div>
+            <div class="announcement-form">
+                <textarea id="announcement-content" placeholder="Drop a fucking announcement..."></textarea>
+                <button onclick="addAnnouncement()">Post Announcement</button>
+            </div>
+        </div>
+        <div id="threads">
+            <!-- Threads go here -->
+        </div>
+        <div class="post-form">
+            <input id="thread-title" placeholder="Thread Title" />
+            <textarea id="thread-content" placeholder="Start a fucking thread..."></textarea>
+            <button onclick="addThread()">Create Thread</button>
+        </div>
+        <div class="chat-log">
+            <h2>Your Chat History</h2>
+            <div id="chat-entries"></div>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const uid = urlParams.get('uid') || 'UID-UNKNOWN';
+        const username = urlParams.get('username') || 'Anonymous';
+
+        const users = JSON.parse(localStorage.getItem('boltUsers')) || {
+            'Bolt!': { uid: 'UID-0001', password: 'bolt!', created: '2025-03-29T12:00:00Z', lastOnline: '2025-03-29T12:00:00Z', pfp: '', displayName: 'BoltMaster' },
+            'listn': { uid: 'UID-0002', password: 'listnupdates', created: '2025-03-29T12:05:00Z', lastOnline: '2025-03-29T12:05:00Z', pfp: '', displayName: 'ListnUp' }
+        };
+        const userData = users[username] || { created: 'Unknown', lastOnline: 'Unknown', pfp: '', displayName: username };
+        
+        document.getElementById('user-info').innerHTML = `
+            Logged in as: ${username} (${uid}) [<a href="bio.html?uid=${uid}&username=${encodeURIComponent(username)}">Bio</a>]<br>
+            Joined: ${new Date(userData.created).toLocaleString()}<br>
+            Last Online: ${new Date(userData.lastOnline).toLocaleString()}
+        `;
+        
+        document.getElementById('bio-tab').href = `bio.html?uid=${uid}&username=${encodeURIComponent(username)}`;
+
+        // Profile display
+        const defaultPFP = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVFhH7Za9DYBACES7/QX3bsEH2NjY2NjY2NjY2NgYxsbGxsYQEf+EBUFEtVrVqlUAgL6+PhqN5vP5TqdTqVSCIAjW6/XpdDqVSqVSCYIgWKlUis/n8/l8Pp1OpVIJgiBYqVSKzWaz2Ww2m82mUqkEgSBYqVSK3W63W+12u91ut9vtVCoBIJDP5/P5fD6fTqfT6XQ6nUqlEgSCYL1eD4IgWKlUIAgC2Ww2m82mUqlUgiAI1uv1er1er9fr9Xq9Xq/X6/U6nUqlUgmCIAjW6/V6vV6v1+t1Op1KpRIEmwE2nH4aK4fSAAAAAElFTkSuQmCC';
+        document.getElementById('profile-pfp').src = userData.pfp || defaultPFP;
+        document.getElementById('display-name').textContent = userData.displayName || username;
+
+        let threads = JSON.parse(localStorage.getItem('boltThreads')) || [
+            {
+                id: 1,
+                title: "First Blood",
+                content: "This forum’s alive, bitches!",
+                uid: "UID-0001",
+                username: "Bolt!",
+                created: "2025-03-29T12:00:00Z",
+                comments: [
+                    { content: "Hell yeah it is!", uid: "UID-0002", username: "listn", created: "2025-03-29T12:05:00Z" }
+                ]
+            },
+            {
+                id: 2,
+                title: "Shitposting Central",
+                content: "Post your worst takes here.",
+                uid: "UID-0002",
+                username: "listn",
+                created: "2025-03-29T12:10:00Z",
+                comments: [
+                    { content: "Pineapple on pizza rules.", uid: "UID-0001", username: "Bolt!", created: "2025-03-29T12:15:00Z" }
+                ]
+            }
+        ];
+
+        let announcements = JSON.parse(localStorage.getItem('boltAnnouncements')) || [
+            {
+                id: 1,
+                content: "Welcome to the Bolt! Forum, fuckers!",
+                uid: "UID-0001",
+                username: "Bolt!",
+                created: "2025-03-29T12:00:00Z"
+            }
+        ];
+
+        function renderAnnouncements() {
+            const announceDiv = document.getElementById('announcement-entries');
+            announceDiv.innerHTML = '';
+            announcements.forEach(announce => {
+                const entryDiv = document.createElement('div');
+                entryDiv.className = 'announcement';
+                entryDiv.innerHTML = `
+                    <p>${announce.content}</p>
+                    <div class="meta">Posted by ${users[announce.username]?.displayName || announce.username} (${announce.uid}) on ${new Date(announce.created).toLocaleString()}</div>
+                `;
+                announceDiv.appendChild(entryDiv);
+            });
+        }
+
+        function renderThreads() {
+            const threadsDiv = document.getElementById('threads');
+            threadsDiv.innerHTML = '';
+            threads.forEach(thread => {
+                const threadDiv = document.createElement('div');
+                threadDiv.className = 'thread';
+                threadDiv.innerHTML = `
+                    <h3>${thread.title}</h3>
+                    <p class="op">${thread.content}</p>
+                    <div class="meta">Posted by ${users[thread.username]?.displayName || thread.username} (${thread.uid}) on ${new Date(thread.created).toLocaleString()}</div>
+                    <div class="comments">
+                        ${thread.comments.map(comment => `
+                            <div class="comment">
+                                <p>${comment.content}</p>
+                                <div class="meta">Replied by ${users[comment.username]?.displayName || comment.username} (${comment.uid}) on ${new Date(comment.created).toLocaleString()}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="reply-form">
+                        <textarea placeholder="Add a fucking comment..." id="reply-${thread.id}"></textarea>
+                        <button onclick="addComment(${thread.id})">Reply</button>
+                    </div>
+                `;
+                threadsDiv.appendChild(threadDiv);
+            });
+            renderChatLog();
+        }
+
+        function renderChatLog() {
+            const chatDiv = document.getElementById('chat-entries');
+            chatDiv.innerHTML = '';
+            const userPosts = [];
+
+            threads.forEach(thread => {
+                if (thread.uid === uid) {
+                    userPosts.push({
+                        type: 'Thread',
+                        title: thread.title,
+                        content: thread.content,
+                        created: thread.created
+                    });
+                }
+                thread.comments.forEach(comment => {
+                    if (comment.uid === uid) {
+                        userPosts.push({
+                            type: 'Comment',
+                            title: thread.title,
+                            content: comment.content,
+                            created: comment.created
+                        });
+                    }
+                });
+            });
+
+            userPosts.sort((a, b) => new Date(a.created) - new Date(b.created));
+            userPosts.forEach(post => {
+                const entryDiv = document.createElement('div');
+                entryDiv.className = 'chat-entry';
+                entryDiv.innerHTML = `
+                    <p><strong>${post.type} on "${post.title}"</strong>: ${post.content}</p>
+                    <div class="meta">Sent on ${new Date(post.created).toLocaleString()}</div>
+                `;
+                chatDiv.appendChild(entryDiv);
+            });
+
+            if (!userPosts.length) {
+                chatDiv.innerHTML = '<p>No fucking posts yet, asshole.</p>';
+            }
+        }
+
+        function addAnnouncement() {
+            const content = document.getElementById('announcement-content').value.trim();
+            if (content) {
+                const newId = announcements.length ? Math.max(...announcements.map(a => a.id)) + 1 : 1;
+                announcements.push({
+                    id: newId,
+                    content,
+                    uid,
+                    username,
+                    created: new Date().toISOString()
+                });
+                document.getElementById('announcement-content').value = '';
+                localStorage.setItem('boltAnnouncements', JSON.stringify(announcements));
+                renderAnnouncements();
+            }
+        }
+
+        function addThread() {
+            const title = document.getElementById('thread-title').value.trim();
+            const content = document.getElementById('thread-content').value.trim();
+            if (title && content) {
+                const newId = threads.length ? Math.max(...threads.map(t => t.id)) + 1 : 1;
+                threads.push({
+                    id: newId,
+                    title,
+                    content,
+                    uid,
+                    username,
+                    created: new Date().toISOString(),
+                    comments: []
+                });
+                document.getElementById('thread-title').value = '';
+                document.getElementById('thread-content').value = '';
+                localStorage.setItem('boltThreads', JSON.stringify(threads));
+                renderThreads();
+            }
+        }
+
+        function addComment(threadId) {
+            const textarea = document.getElementById(`reply-${threadId}`);
+            const content = textarea.value.trim();
+            if (content) {
+                const thread = threads.find(t => t.id === threadId);
+                thread.comments.push({ content, uid, username, created: new Date().toISOString() });
+                textarea.value = '';
+                localStorage.setItem('boltThreads', JSON.stringify(threads));
+                renderThreads();
+            }
+        }
+
+        renderAnnouncements();
+        renderThreads();
+    </script>
+</body>
+</html>

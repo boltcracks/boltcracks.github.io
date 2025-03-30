@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bolt! - Bio</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #1C2526;
+            color: #7289DA;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            font-size: 72px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-shadow: 
+                0 0 10px #FF0000,
+                0 0 20px #800080;
+        }
+        .bio-container {
+            margin-top: 50px;
+            background-color: #2A3439;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+            width: 400px;
+        }
+        .user-info {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        .pfp {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            object-fit: cover;
+            border: 2px solid #7289DA;
+        }
+        .bio-form input, .bio-form textarea {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #1C2526;
+            border: 1px solid #7289DA;
+            color: #fff;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .bio-form button {
+            width: 100%;
+            padding: 10px;
+            background-color: #7289DA;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .bio-form button:hover {
+            background-color: #FF0000;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #7289DA;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            color: #FF0000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bolt!</h1>
+    <div class="bio-container">
+        <div class="user-info" id="user-info"></div>
+        <img id="pfp" class="pfp" src="" alt="Profile Picture" />
+        <div class="bio-form">
+            <input type="text" id="display-name" placeholder="Display Name" />
+            <input type="file" id="pfp-upload" accept="image/*" />
+            <button onclick="saveBio()">Save Changes</button>
+        </div>
+        <a href="#" id="back-link" class="back-link">Back to Profile</a>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const uid = urlParams.get('uid') || 'UID-UNKNOWN';
+        const username = urlParams.get('username') || 'Anonymous';
+
+        const hardcodedUsers = {
+            'Bolt!': { uid: 'UID-0001', created: '2025-03-29T12:00:00Z', lastOnline: new Date().toISOString(), role: 'Bolt!' },
+            'listn': { uid: 'UID-0002', created: '2025-03-29T12:05:00Z', lastOnline: new Date().toISOString(), role: 'listn' }
+        };
+
+        let storedUsers = JSON.parse(localStorage.getItem('boltUsers')) || {};
+        const allUsers = { ...hardcodedUsers, ...storedUsers };
+        const userData = allUsers[username] || { created: 'Unknown', lastOnline: 'Unknown', role: 'Member' };
+
+        let bioData = JSON.parse(localStorage.getItem('boltBioData')) || {
+            'UID-0001': { displayName: 'Bolt!', pfp: 'https://via.placeholder.com/100' },
+            'UID-0002': { displayName: 'listn', pfp: 'https://via.placeholder.com/100' }
+        };
+
+        document.getElementById('user-info').innerHTML = `
+            Username: ${username} (${uid})<br>
+            Joined: ${new Date(userData.created).toLocaleString()}<br>
+            Last Online: ${new Date(userData.lastOnline).toLocaleString()}
+        `;
+        document.getElementById('pfp').src = bioData[uid].pfp;
+        document.getElementById('display-name').value = bioData[uid].displayName;
+        document.getElementById('back-link').href = `recent.html?uid=${uid}&username=${encodeURIComponent(username)}`;
+
+        function saveBio() {
+            const displayName = document.getElementById('display-name').value.trim() || bioData[uid].displayName;
+            const fileInput = document.getElementById('pfp-upload');
+            const file = fileInput.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    bioData[uid] = { displayName, pfp: e.target.result };
+                    localStorage.setItem('boltBioData', JSON.stringify(bioData));
+                    document.getElementById('pfp').src = e.target.result;
+                    alert('Bio fucking updated, prick.');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                bioData[uid] = { displayName, pfp: bioData[uid].pfp };
+                localStorage.setItem('boltBioData', JSON.stringify(bioData));
+                alert('Bio fucking updated, prick.');
+            }
+        }
+    </script>
+</body>
+</html>
